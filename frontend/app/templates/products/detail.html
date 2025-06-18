@@ -1,0 +1,32 @@
+<!-- app/templates/products/detail.html -->
+{% extends "base.html" %}
+
+{% block title %}{{ product.nombre }}{% endblock %}
+
+{% block content %}
+<div class="product-detail">
+    <div class="product-image">
+        <img src="{{ product.imagen_url or url_for('static', filename='images/placeholder.png') }}" alt="{{ product.nombre }}">
+    </div>
+    <div class="product-info">
+        <h1>{{ product.nombre }}</h1>
+        <p class="price">
+            {% if product.precio_descuento %}
+                <span class="original-price">${{ product.precio }}</span>
+                <span class="discounted-price">${{ product.precio_descuento }}</span>
+            {% else %}
+                ${{ product.precio }}
+            {% endif %}
+        </p>
+        <p class="description">{{ product.descripcion }}</p>
+        <form method="POST" action="{{ url_for('cart.add_to_cart') }}">
+            <input type="hidden" name="product_id" value="{{ product.id_producto }}">
+            <div class="form-group">
+                <label for="quantity">Quantity:</label>
+                <input type="number" name="quantity" value="1" min="1" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Add to Cart</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
