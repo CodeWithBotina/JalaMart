@@ -1,0 +1,30 @@
+<!-- jalamart_frontend/templates/public/categories.html -->
+{% extends 'layouts/base.html' %}
+
+{% block title %}All Categories{% endblock %}
+
+{% block content %}
+    <div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <h1 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">All Categories</h1>
+
+        {% if categories %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {% for category in categories %}
+                    <a href="{{ url_for('public_bp.products_by_category', category_id=category.id_categoria) }}"
+                       class="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 p-6 flex flex-col items-center text-center transform hover:scale-105">
+                        <img src="{{ category.imagen_url if category.imagen_url else url_for('static', filename='img/category_placeholder.png') }}"
+                             alt="{{ category.nombre }}" class="w-24 h-24 mb-4 rounded-full object-cover">
+                        <h2 class="text-xl font-semibold text-blue-700">{{ category.nombre }}</h2>
+                        <p class="text-gray-600 text-sm mt-2">{{ category.descripcion | truncate(100) }}</p>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-center text-gray-600 mt-10">No categories found.</p>
+        {% endif %}
+
+        <div class="mt-10 text-center">
+            <a href="{{ url_for('public_bp.home') }}" class="btn-secondary">Back to Home</a>
+        </div>
+    </div>
+{% endblock %}

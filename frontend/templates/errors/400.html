@@ -1,0 +1,13 @@
+<!-- jalamart_frontend/templates/errors/400.html -->
+{% extends 'layouts/base.html' %}
+
+{% block title %}Bad Request{% endblock %}
+
+{% block content %}
+    <div class="flex flex-col items-center justify-center min-h-[60vh] text-center">
+        <i class="fas fa-exclamation-circle text-red-500 text-6xl mb-6"></i>
+        <h1 class="text-5xl font-bold text-gray-800 mb-4">400 - Bad Request</h1>
+        <p class="text-lg text-gray-600 mb-8">The server cannot process the request due to something that is perceived to be a client error (e.g., malformed request syntax, invalid message framing, or deceptive request routing).</p>
+        <a href="{{ url_for('public_bp.home') }}" class="btn-primary">Go to Home Page</a>
+    </div>
+{% endblock %}

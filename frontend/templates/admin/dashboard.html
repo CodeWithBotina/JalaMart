@@ -1,0 +1,89 @@
+<!-- jalamart_frontend/templates/admin/dashboard.html -->
+{% extends 'layouts/base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+    <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-white rounded-lg shadow-xl">
+        <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Admin Dashboard</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            <!-- Quick Links -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 shadow-md">
+                <h2 class="text-2xl font-bold text-blue-800 mb-4">Management</h2>
+                <ul class="space-y-3">
+                    <li><a href="{{ url_for('admin_bp.manage_products') }}" class="flex items-center text-blue-700 hover:text-blue-900 font-semibold text-lg"><i class="fas fa-box mr-3"></i>Manage Products</a></li>
+                    <li><a href="{{ url_for('admin_bp.manage_categories') }}" class="flex items-center text-blue-700 hover:text-blue-900 font-semibold text-lg"><i class="fas fa-tags mr-3"></i>Manage Categories</a></li>
+                    <li><a href="{{ url_for('admin_bp.manage_customers') }}" class="flex items-center text-blue-700 hover:text-blue-900 font-semibold text-lg"><i class="fas fa-users mr-3"></i>Manage Customers</a></li>
+                    <li><a href="{{ url_for('admin_bp.manage_orders') }}" class="flex items-center text-blue-700 hover:text-blue-900 font-semibold text-lg"><i class="fas fa-receipt mr-3"></i>Manage Orders</a></li>
+                </ul>
+            </div>
+
+            <!-- Best Selling Products -->
+            <div class="bg-green-50 border border-green-200 rounded-lg p-6 shadow-md">
+                <h2 class="text-2xl font-bold text-green-800 mb-4">Top Selling Products</h2>
+                {% if best_selling_products %}
+                <ul class="space-y-3">
+                    {% for product in best_selling_products[:5] %} {# Show top 5 #}
+                    <li class="flex items-center">
+                        <i class="fas fa-medal text-yellow-500 mr-2"></i>
+                        <span class="font-medium text-gray-800">{{ product.nombre }}</span>
+                        <span class="ml-auto text-green-700 font-semibold">{{ product.cantidad_vendida }} units</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-gray-600">No data available for best selling products.</p>
+                {% endif %}
+            </div>
+
+            <!-- Most Active Customers -->
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 shadow-md">
+                <h2 class="text-2xl font-bold text-yellow-800 mb-4">Most Active Customers</h2>
+                {% if most_active_customers %}
+                <ul class="space-y-3">
+                    {% for customer in most_active_customers[:5] %} {# Show top 5 #}
+                    <li class="flex items-center">
+                        <i class="fas fa-star text-orange-500 mr-2"></i>
+                        <span class="font-medium text-gray-800 truncate">{{ customer.nombre_completo }} ({{ customer.email }})</span>
+                        <span class="ml-auto text-yellow-700 font-semibold"><span class="math-inline">\{\{ "%\.2f" \| format\(customer\.total\_gastado\) \}\} spent</span\>
+</li\>
+\{% endfor %\}
+</ul\>
+\{% else %\}
+<p class\="text\-gray\-600"\>No data available for most active customers\.</p\>
+\{% endif %\}
+</div\>
+<\!\-\- Sales by Category \-\-\>
+<div class\="bg\-purple\-50 border border\-purple\-200 rounded\-lg p\-6 shadow\-md col\-span\-full"\>
+<h2 class\="text\-2xl font\-bold text\-purple\-800 mb\-4"\>Sales by Category</h2\>
+\{% if sales\_by\_category %\}
+<div class\="overflow\-x\-auto"\>
+<table class\="min\-w\-full bg\-white rounded\-lg overflow\-hidden"\>
+<thead class\="bg\-purple\-100"\>
+<tr\>
+<th class\="py\-3 px\-4 text\-left text\-sm font\-semibold text\-purple\-700"\>Category</th\>
+<th class\="py\-3 px\-4 text\-left text\-sm font\-semibold text\-purple\-700"\>Total Orders</th\>
+<th class\="py\-3 px\-4 text\-left text\-sm font\-semibold text\-purple\-700"\>Total Products</th\>
+<th class\="py\-3 px\-4 text\-left text\-sm font\-semibold text\-purple\-700"\>Total Sales</th\>
+</tr\>
+</thead\>
+<tbody\>
+\{% for sale in sales\_by\_category %\}
+<tr class\="border\-t border\-gray\-100 hover\:bg\-gray\-50"\>
+<td class\="py\-3 px\-4 text\-gray\-800"\>\{\{ sale\.categoria \}\}</td\>
+<td class\="py\-3 px\-4 text\-gray\-800"\>\{\{ sale\.total\_pedidos \}\}</td\>
+<td class\="py\-3 px\-4 text\-gray\-800"\>\{\{ sale\.total\_productos \}\}</td\>
+<td class\="py\-3 px\-4 text\-gray\-800 font\-semibold"\></span>{{ "%.2f" | format(sale.total_ventas) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-gray-600">No data available for sales by category.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

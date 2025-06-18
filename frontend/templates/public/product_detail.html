@@ -1,0 +1,119 @@
+<!-- jalamart_frontend/templates/public/product_detail.html -->
+{% extends 'layouts/base.html' %}
+
+{% block title %}Product Detail{% endblock %}
+
+{% block content %}
+    <div class="bg-white rounded-lg shadow-xl p-8 flex flex-col md:flex-row gap-8 items-start">
+        {% if product %}
+            <!-- Product Image -->
+            <div class="w-full md:w-1/2 lg:w-1/3 flex-shrink-0">
+                <img src="{{ product.imagen_url if product.imagen_url else url_for('static', filename='img/product_detail_placeholder.png') }}"
+                     alt="{{ product.nombre }}" class="w-full h-80 object-contain rounded-lg shadow-md">
+            <div class="w-full md:w-1/2 lg:w-2/3">
+                <h1 class="text-4xl font-extrabold text-gray-900 mb-4">{{ product.nombre }}</h1>
+                <p class="text-lg text-blue-600 font-semibold mb-4">Category: {{ product.categoria_nombre }}</p>
+
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Description:</h2>
+                    <p class="text-gray-700 leading-relaxed">{{ product.descripcion }}</p>
+                </div>
+
+                <div class="flex items-baseline mb-6">
+                    {% if product.precio_descuento and (product.precio_descuento | float) < (product.precio | float) %}
+                        <span class="text-4xl font-bold text-red-600 mr-3">${{ "%.2f" | format(product.precio_descuento | float) }}</span>
+                        <span class="text-xl text-gray-500 line-through">${{ "%.2f" | format(product.precio | float) }}</span>
+                        <span class="ml-4 text-green-600 font-semibold text-lg">Save ${{ "%.2f" | format(product.precio | float - product.precio_descuento | float) }}!</span>
+                    {% else %}
+                        <span class="text-4xl font-bold text-gray-900">${{ "%.2f" | format(product.precio | float) }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="mb-6">
+                    <label for="quantity" class="block text-gray-700 text-sm font-bold mb-2">Quantity:</label>
+                    <input type="number" id="quantity" name="quantity" min="1" value="1"
+                           class="w-24 p-2 border border-gray-300 rounded-md text-center focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <span class="ml-4 text-gray-600">Available: {{ product.stock }} in stock</span>
+                </div>
+
+                <button id="add-to-cart-btn" data-product-id="{{ product.id_producto }}"
+                        class="btn-primary flex items-center justify-center px-8 py-3 w-full md:w-auto">
+                    <i class="fas fa-cart-plus mr-2"></i> ADD TO CART
+                </button>
+            </div>
+        {% else %}
+            <p class="text-center text-gray-600 w-full">Product details could not be loaded. Please try again later.</p>
+        {% endif %}
+    </div>
+
+    <!-- Add a hidden div for custom message box -->
+    <div id="custom-message-box" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg text-center max-w-sm w-full">
+            <p id="message-text" class="text-lg font-semibold text-gray-800 mb-4"></p>
+            <button id="close-message-box" class="btn-primary">OK</button>
+        </div>
+    </div>
+
+
+    <script>
+        // Custom message box functions (replacing alert())
+        function showMessageBox(message) {
+            document.getElementById('message-text').textContent = message;
+            document.getElementById('custom-message-box').classList.remove('hidden');
+        }
+
+        document.getElementById('close-message-box').addEventListener('click', function() {
+            document.getElementById('custom-message-box').classList.add('hidden');
+        });
+
+        // Add to cart functionality
+        document.getElementById('add-to-cart-btn').addEventListener('click', async function() {
+            const productId = this.dataset.productId;
+            const quantity = parseInt(document.getElementById('quantity').value);
+
+            if (quantity <= 0 || isNaN(quantity)) {
+                showMessageBox('Please enter a valid quantity.');
+                return;
+            }
+
+            // Client-side validation: Check if quantity exceeds stock
+            const stock = parseInt("{{ product.stock if product else 0 }}");
+            if (quantity > stock) {
+                showMessageBox('Requested quantity exceeds available stock.');
+                return;
+            }
+
+            try {
+                const response = await fetch("{{ url_for('user_bp.add_to_cart') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id_producto: productId,
+                        cantidad: quantity
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showMessageBox('Product added to cart successfully!');
+                    // Optionally update cart item count in the header
+                    // This requires a mechanism to update the session or re-render part of the header.
+                    // For now, a full page reload or a specific API call to update the count is simpler.
+                    // A better approach would be to use a small client-side JS framework or
+                    // update session and re-render header via Flask endpoint for partial updates.
+                    setTimeout(() => {
+                        window.location.reload(); // Simple reload to update cart count in header
+                    }, 1000);
+                } else {
+                    showMessageBox(data.message || 'Failed to add product to cart.');
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                showMessageBox('An error occurred while adding to cart. Please try again.');
+            }
+        });
+    </script>
+{% endblock %}

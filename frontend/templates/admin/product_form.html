@@ -1,0 +1,100 @@
+<!-- jalamart_frontend/templates/admin/product_form.html -->
+{% extends 'layouts/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <div class="flex items-center justify-center min-h-[70vh] bg-gray-100 py-8">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-2xl">
+            <h1 class="text-3xl font-bold text-gray-800 text-center mb-8">{{ title }}</h1>
+
+            <form method="POST">
+                {{ form.csrf_token }}
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        {{ form.nombre.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                        {{ form.nombre(class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="Product Name") }}
+                        {% for error in form.nombre.errors %}
+                            <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        {{ form.sku.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                        {{ form.sku(class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="SKU12345") }}
+                        {% for error in form.sku.errors %}
+                            <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    {{ form.descripcion.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                    {{ form.descripcion(class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", rows="4", placeholder="Detailed product description...") }}
+                    {% for error in form.descripcion.errors %}
+                        <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div>
+                        {{ form.precio.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                        {{ form.precio(class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="99.99") }}
+                        {% for error in form.precio.errors %}
+                            <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        {{ form.precio_descuento.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                        {{ form.precio_descuento(class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="79.99 (Optional)") }}
+                        {% for error in form.precio_descuento.errors %}
+                            <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        {{ form.stock.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                        {{ form.stock(class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="100") }}
+                        {% for error in form.stock.errors %}
+                            <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        {{ form.id_categoria.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                        {{ form.id_categoria(class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500") }}
+                        {% for error in form.id_categoria.errors %}
+                            <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        {{ form.id_proveedor.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                        {{ form.id_proveedor(class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="1") }}
+                        {% for error in form.id_proveedor.errors %}
+                            <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    {{ form.imagen_url.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                    {{ form.imagen_url(class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="[https://example.com/product-image.jpg](https://example.com/product-image.jpg)") }}
+                    {% for error in form.imagen_url.errors %}
+                        <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-6 flex items-center">
+                    {{ form.activo(class="form-checkbox h-5 w-5 text-blue-600 rounded-md") }}
+                    {{ form.activo.label(class="ml-2 text-gray-700 text-sm font-bold") }}
+                </div>
+
+                <div class="flex justify-between items-center mt-8">
+                    <a href="{{ url_for('admin_bp.manage_products') }}" class="btn-secondary px-6 py-3">Cancel</a>
+                    {{ form.submit(class="btn-primary py-3 px-8") }}
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

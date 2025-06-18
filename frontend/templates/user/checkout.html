@@ -1,0 +1,81 @@
+<!-- jalamart_frontend/templates/user/checkout.html -->
+{% extends 'layouts/base.html' %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+    <div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-white rounded-lg shadow-xl">
+        <h1 class="text-3xl font-extrabold text-gray-900 mb-8 text-center">Checkout</h1>
+
+        {% if cart_items %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Order Summary -->
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Order Summary</h2>
+                    <div class="space-y-4 border border-gray-200 rounded-lg p-4">
+                        {% for item in cart_items %}
+                            <div class="flex items-center justify-between pb-2 border-b border-gray-100 last:border-b-0">
+                                <div class="flex items-center">
+                                    <img src="{{ item.imagen_url if item.imagen_url else url_for('static', filename='img/product_placeholder.png') }}"
+                                         alt="{{ item.nombre_producto }}" class="w-16 h-16 object-contain rounded-md mr-3">
+                                    <div>
+                                        <p class="font-semibold text-gray-900">{{ item.nombre_producto }}</p>
+                                        <p class="text-sm text-gray-600">Qty: {{ item.cantidad }}</p>
+                                    </div>
+                                </div>
+                                <span class="font-bold text-gray-800"><span class="math-inline">\{\{ "%\.2f" \| format\(item\.precio\_total\) \}\}</span\>
+</div\>
+\{% endfor %\}
+</div\>
+<div class\="mt\-6 p\-4 bg\-blue\-50 rounded\-lg"\>
+<div class\="flex justify\-between items\-center text\-lg font\-semibold text\-gray\-700 py\-1"\>
+<span\>Subtotal\:</span\>
+<span\></span>{{ "%.2f" | format(total_amount / 1.16) }}</span> <!-- Rough estimate, backend will calculate precisely -->
+                        </div>
+                        <div class="flex justify-between items-center text-lg font-semibold text-gray-700 py-1">
+                            <span>Taxes (16%):</span>
+                            <span><span class="math-inline">\{\{ "%\.2f" \| format\(total\_amount \* 0\.16 / 1\.16\) \}\}</span\> <\!\-\- Rough estimate \-\-\>
+</div\>
+<div class\="flex justify\-between items\-center text\-2xl font\-bold text\-gray\-900 py\-2 border\-t border\-blue\-200 mt\-2"\>
+<span\>Total\:</span\>
+<span\></span>{{ "%.2f" | format(total_amount) }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shipping and Payment Form -->
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Shipping & Payment</h2>
+                    <form method="POST" action="{{ url_for('user_bp.checkout') }}" class="space-y-6">
+                        <div>
+                            <label for="shipping_address" class="block text-gray-700 text-sm font-bold mb-2">Shipping Address:</label>
+                            <!-- In a real app, this would be a dropdown of saved addresses or an input to add new -->
+                            <textarea id="shipping_address" name="direccion_envio" rows="3"
+                                      class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      placeholder="Enter your shipping address" required>{{ customer_profile.direccion if customer_profile else '' }}</textarea>
+                        </div>
+
+                        <div>
+                            <label for="payment_method" class="block text-gray-700 text-sm font-bold mb-2">Payment Method:</label>
+                            <select id="payment_method" name="payment_method"
+                                    class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="Credit Card">Credit Card</option>
+                                <option value="Debit Card">Debit Card</option>
+                                <option value="PayPal">PayPal</option>
+                                <option value="Bank Transfer">Bank Transfer</option>
+                                <option value="Cash">Cash on Delivery</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="w-full btn-primary py-3">Place Order</button>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <p class="text-center text-gray-600 mt-10">Your cart is empty. Please add items before checking out.</p>
+            <div class="mt-8 text-center">
+                <a href="{{ url_for('public_bp.home') }}" class="btn-secondary">Start Shopping</a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

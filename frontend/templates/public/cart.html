@@ -1,0 +1,126 @@
+<!-- jalamart_frontend/templates/public/cart.html -->
+{% extends 'layouts/base.html' %}
+
+{% block title %}My Cart{% endblock %}
+
+{% block content %}
+    <div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-white rounded-lg shadow-xl">
+        <h1 class="text-3xl font-extrabold text-gray-900 mb-8 text-center">My Cart ({{ cart_items|length }})</h1>
+
+        {% if cart_items %}
+            <div class="space-y-6">
+                {% for item in cart_items %}
+                    <div class="flex items-center border-b border-gray-200 pb-4 last:border-b-0">
+                        <img src="{{ item.imagen_url if item.imagen_url else url_for('static', filename='img/product_placeholder.png') }}"
+                             alt="{{ item.nombre_producto }}" class="w-24 h-24 object-contain rounded-md mr-4 flex-shrink-0">
+                        <div class="flex-grow">
+                            <h2 class="text-xl font-semibold text-gray-900">{{ item.nombre_producto }}</h2>
+                            <p class="text-gray-600 mb-2 truncate">{{ item.descripcion | truncate(100) }}</p>
+                            <p class="text-lg font-bold text-gray-800">${{ "%.2f" | format(item.precio_unitario) }} x {{ item.cantidad }}</p>
+                        </div>
+                        <div class="flex items-center space-x-3 ml-4 flex-shrink-0">
+                            <input type="number" value="{{ item.cantidad }}" min="1"
+                                   data-item-id="{{ item.id_item }}"
+                                   class="w-20 p-2 border border-gray-300 rounded-md text-center update-quantity-input">
+                            <button data-item-id="{{ item.id_item }}"
+                                    class="bg-red-500 text-white p-2 rounded-md hover:bg-red-600 transition-colors remove-item-btn">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="flex justify-end items-center mt-8 pt-4 border-t border-gray-200">
+                <span class="text-2xl font-bold text-gray-900 mr-4">TOTAL: ${{ "%.2f" | format(total_amount) }}</span>
+                <a href="{{ url_for('user_bp.checkout') }}" class="btn-primary py-3 px-6">BUY NOW</a>
+            </div>
+        {% else %}
+            <p class="text-center text-gray-600 mt-10">Your cart is empty.</p>
+            <div class="mt-8 text-center">
+                <a href="{{ url_for('public_bp.home') }}" class="btn-secondary">Start Shopping</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Add a hidden div for custom message box -->
+    <div id="custom-message-box" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg text-center max-w-sm w-full">
+            <p id="message-text" class="text-lg font-semibold text-gray-800 mb-4"></p>
+            <button id="close-message-box" class="btn-primary">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Custom message box functions (replacing alert())
+        function showMessageBox(message) {
+            document.getElementById('message-text').textContent = message;
+            document.getElementById('custom-message-box').classList.remove('hidden');
+        }
+
+        document.getElementById('close-message-box').addEventListener('click', function() {
+            document.getElementById('custom-message-box').classList.add('hidden');
+        });
+
+        // Event listeners for quantity update
+        document.querySelectorAll('.update-quantity-input').forEach(input => {
+            input.addEventListener('change', async function() {
+                const itemId = this.dataset.itemId;
+                const newQuantity = parseInt(this.value);
+
+                if (isNaN(newQuantity) || newQuantity < 0) {
+                    showMessageBox('Please enter a valid quantity.');
+                    this.value = this.defaultValue; // Revert to previous value
+                    return;
+                }
+
+                try {
+                    const response = await fetch("{{ url_for('user_bp.update_cart_item', item_id=0) }}".replace('/0', `/${itemId}`), {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ cantidad: newQuantity })
+                    });
+                    const data = await response.json();
+
+                    if (response.ok && data.success) {
+                        showMessageBox('Cart updated!');
+                        setTimeout(() => { window.location.reload(); }, 500); // Reload to reflect changes
+                    } else {
+                        showMessageBox(data.message || 'Failed to update cart.');
+                        this.value = this.defaultValue; // Revert on error
+                    }
+                } catch (error) {
+                    console.error('Error updating cart item:', error);
+                    showMessageBox('An error occurred while updating the cart.');
+                    this.value = this.defaultValue; // Revert on error
+                }
+            });
+        });
+
+        // Event listeners for item removal
+        document.querySelectorAll('.remove-item-btn').forEach(button => {
+            button.addEventListener('click', async function() {
+                const itemId = this.dataset.itemId;
+                if (confirm('Are you sure you want to remove this item from your cart?')) {
+                    try {
+                        const response = await fetch("{{ url_for('user_bp.remove_cart_item', item_id=0) }}".replace('/0', `/${itemId}`), {
+                            method: 'POST', // Using POST for deletion requests via forms/JS
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+                        const data = await response.json();
+
+                        if (response.ok && data.success) {
+                            showMessageBox('Item removed.');
+                            setTimeout(() => { window.location.reload(); }, 500); // Reload to reflect changes
+                        } else {
+                            showMessageBox(data.message || 'Failed to remove item.');
+                        }
+                    } catch (error) {
+                        console.error('Error removing cart item:', error);
+                        showMessageBox('An error occurred while removing the item.');
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

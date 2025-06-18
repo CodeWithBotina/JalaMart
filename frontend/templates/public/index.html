@@ -1,0 +1,103 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <div class="space-y-12">
+        <section class="special-offer-banner relative overflow-hidden">
+            <div class="absolute inset-0 bg-cover bg-center opacity-20" style="background-image: url('{{ url_for('static', filename='img/headphones_banner.png') }}');"></div>
+            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between text-center md:text-left">
+                <div class="flex-1">
+                    <h1 class="text-5xl md:text-6xl font-extrabold mb-4 animate-fade-in-down">JALAMART</h1>
+                    <p class="text-3xl md:text-4xl font-semibold mb-2">SPECIAL OFFER</p>
+                    <p class="text-6xl md:text-8xl font-bold text-yellow-300 mb-4">{{ "95 USD" if special_offer else "Amazing Deals!" }}</p>
+                    <p class="text-lg md:text-xl font-medium">OFFER VALID UNTIL JULY 9, 2025</p>
+                    <button class="mt-8 bg-white text-blue-800 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-gray-100 hover:scale-105 transition-all duration-300">
+                        SHOP NOW
+                    </button>
+                </div>
+                <div class="mt-8 md:mt-0 md:ml-12">
+                    <img src="{{ url_for('static', filename='img/headphones_placeholder.png') }}" alt="Special Offer Headphones" class="w-64 md:w-80 h-auto animate-fade-in-right">
+                </div>
+            </div>
+        </section>
+        <section class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
+            {% for category in categories %}
+            <a href="{{ url_for('public_bp.products_by_category', category_id=category.id_categoria) }}" class="flex flex-col items-center p-4 bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 transform hover:scale-105">
+                <img src="{{ category.imagen_url if category.imagen_url else url_for('static', filename='img/category_placeholder.png') }}" alt="{{ category.nombre }}" class="w-16 h-16 mb-2 rounded-full object-cover">
+                <span class="font-medium text-blue-700">{{ category.nombre }}</span>
+            </a>
+            {% endfor %}
+        </section>
+        <section>
+            <h2 class="text-3xl font-bold mb-6 text-gray-800">Best Offers</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {% for product in best_offers %}
+                <div class="product-card">
+                    <div class="relative">
+                        {% if product.porcentaje_descuento %}
+                        <span class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full z-10">-{{ product.porcentaje_descuento }}%</span>
+                        {% endif %}
+                        <img src="{{ product.imagen_url if product.imagen_url else url_for('static', filename='img/product_placeholder.png') }}"
+                             alt="{{ product.nombre }}" class="w-full h-40 object-cover mb-4 rounded-md">
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 truncate">{{ product.nombre }}</h3>
+                    <p class="text-sm text-gray-600 mb-2 truncate">{{ product.categoria }}</p>
+                    <div class="flex items-baseline mb-4">
+                        {% if product.precio_descuento and product.precio_descuento < product.precio %}
+                        <span class="text-lg font-bold text-red-600">${{ "%.2f" | format(product.precio_descuento | float) }}</span>
+                        <span class="text-sm text-gray-500 line-through ml-2">${{ "%.2f" | format(product.precio | float) }}</span>
+                        {% else %}
+                        <span class="text-lg font-bold text-gray-900">${{ "%.2f" | format(product.precio) }}</span>
+                        {% endif %}
+                    </div>
+                    <a href="{{ url_for('public_bp.product_detail', product_id=product.id_producto) }}" class="w-full btn-primary text-center">SHOP NOW</a>
+                </div>
+                {% else %}
+                <p class="text-gray-600 col-span-full">No best offers available at the moment.</p>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-8">
+                <a href="#" class="btn-secondary">SEE ALL</a> </div>
+        </section>
+
+        <section>
+            <h2 class="text-3xl font-bold mb-6 text-gray-800">Most Sold Products</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {% for product in most_sold_products %}
+                <div class="product-card">
+                    <img src="{{ product.imagen_url if product.imagen_url else url_for('static', filename='img/product_placeholder.png') }}"
+                         alt="{{ product.nombre }}" class="w-full h-40 object-cover mb-4 rounded-md">
+                    <h3 class="text-lg font-semibold text-gray-900 truncate">{{ product.nombre }}</h3>
+                    <p class="text-sm text-gray-600 mb-2 truncate">{{ product.descripcion | truncate(50) }}</p>
+                    <p class="text-lg font-bold text-gray-900 mb-4">${{ "%.2f" | format(product.precio) }}</p>
+                    <a href="{{ url_for('public_bp.product_detail', product_id=product.id_producto) }}" class="w-full btn-primary text-center">SHOP NOW</a>
+                </div>
+                {% else %}
+                <p class="text-gray-600 col-span-full">No most sold products available at the moment.</p>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-8">
+                <a href="#" class="btn-secondary">SEE MORE</a> </div>
+        </section>
+        <section>
+            <h2 class="text-3xl font-bold mb-6 text-gray-800">Recently Purchased Products</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {% for product in recently_purchased_products %}
+                <div class="product-card">
+                    <img src="{{ product.imagen_url if product.imagen_url else url_for('static', filename='img/product_placeholder.png') }}"
+                         alt="{{ product.nombre }}" class="w-full h-40 object-cover mb-4 rounded-md">
+                    <h3 class="text-lg font-semibold text-gray-900 truncate">{{ product.nombre }}</h3>
+                    <p class="text-lg font-bold text-gray-900 mb-4">${{ "%.2f" | format(product.precio) }}</p>
+                    <a href="{{ url_for('public_bp.product_detail', product_id=product.id_producto) }}" class="w-full btn-primary text-center">SHOP NOW</a>
+                </div>
+                {% else %}
+                <p class="text-gray-600 col-span-full">No recently purchased products to display.</p>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-8">
+                <a href="#" class="btn-secondary">SEE MORE</a> </div>
+        </section>
+
+    </div>
+{% endblock %}

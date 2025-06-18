@@ -1,0 +1,79 @@
+<!-- jalamart_frontend/templates/auth/register.html -->
+{% extends 'layouts/base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+    <div class="flex items-center justify-center min-h-screen bg-gray-100 py-8">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-lg">
+            <h1 class="text-3xl font-bold text-gray-800 text-center mb-8">Create Your JalaMart Account</h1>
+
+            <form method="POST" action="{{ url_for('auth_bp.register') }}">
+                {{ form.csrf_token }}
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+                    <div>
+                        {{ form.nombre.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                        {{ form.nombre(class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="John") }}
+                        {% for error in form.nombre.errors %}
+                            <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        {{ form.apellido.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                        {{ form.apellido(class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="Doe") }}
+                        {% for error in form.apellido.errors %}
+                            <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    {{ form.email.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                    {{ form.email(class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="john.doe@example.com") }}
+                    {% for error in form.email.errors %}
+                        <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-5">
+                    {{ form.telefono.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                    {{ form.telefono(class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="+1234567890") }}
+                    {% for error in form.telefono.errors %}
+                        <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-5">
+                    {{ form.direccion.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                    {{ form.direccion(class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", rows="3", placeholder="123 Main St, Anytown, State, Zip Code") }}
+                    {% for error in form.direccion.errors %}
+                        <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-5">
+                    {{ form.password.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                    {{ form.password(class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="********") }}
+                    {% for error in form.password.errors %}
+                        <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-6">
+                    {{ form.confirm_password.label(class="block text-gray-700 text-sm font-bold mb-2") }}
+                    {{ form.confirm_password(class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="********") }}
+                    {% for error in form.confirm_password.errors %}
+                        <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                {{ form.submit(class="w-full btn-primary py-3") }}
+            </form>
+
+            <div class="mt-8 text-center">
+                <p class="text-gray-600">Already have an account? <a href="{{ url_for('auth_bp.login') }}" class="text-blue-600 hover:text-blue-800 hover:underline font-semibold">Login here</a></p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,45 @@
+<!-- jalamart_frontend/templates/admin/categories.html -->
+{% extends 'layouts/base.html' %}
+
+{% block title %}Manage Categories{% endblock %}
+
+{% block content %}
+    <div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-white rounded-lg shadow-xl">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-extrabold text-gray-900">Manage Categories</h1>
+            <a href="{{ url_for('admin_bp.add_category') }}" class="btn-primary flex items-center">
+                <i class="fas fa-plus mr-2"></i> Add New Category
+            </a>
+        </div>
+
+        {% if categories %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for category in categories %}
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 flex items-center space-x-4 shadow-md">
+                        <img src="{{ category.imagen_url if category.imagen_url else url_for('static', filename='img/category_placeholder.png') }}"
+                             alt="{{ category.nombre }}" class="w-20 h-20 object-contain rounded-full flex-shrink-0">
+                        <div class="flex-grow">
+                            <h2 class="text-xl font-semibold text-gray-900">{{ category.nombre }}</h2>
+                            <p class="text-gray-700 text-sm truncate">{{ category.descripcion | default('No description.', true) }}</p>
+                            <p class="text-sm {% if category.activa %}text-green-600{% else %}text-red-600{% endif %} font-semibold">
+                                Status: {{ 'Active' if category.activa else 'Inactive' }}
+                            </p>
+                        </div>
+                        <div class="flex flex-col space-y-2 ml-4 flex-shrink-0">
+                            <a href="{{ url_for('admin_bp.edit_category', category_id=category.id_categoria) }}" class="btn-secondary px-4 py-2 text-sm text-center">
+                                <i class="fas fa-edit mr-1"></i> Edit
+                            </a>
+                            <form action="{{ url_for('admin_bp.delete_category', category_id=category.id_categoria) }}" method="POST" onsubmit="return confirm('Are you sure you want to change the status of this category?');">
+                                <button type="submit" class="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition-colors shadow-md text-sm">
+                                    <i class="fas fa-power-off mr-1"></i> {{ 'Deactivate' if category.activa else 'Activate' }}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-center text-gray-600 mt-10">No categories found. Start by adding a new one!</p>
+        {% endif %}
+    </div>
+{% endblock %}

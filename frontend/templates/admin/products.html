@@ -1,0 +1,58 @@
+<!-- jalamart_frontend/templates/admin/products.html -->
+{% extends 'layouts/base.html' %}
+
+{% block title %}Manage Products{% endblock %}
+
+{% block content %}
+    <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-white rounded-lg shadow-xl">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-extrabold text-gray-900">Manage Products</h1>
+            <a href="{{ url_for('admin_bp.add_product') }}" class="btn-primary flex items-center">
+                <i class="fas fa-plus mr-2"></i> Add New Product
+            </a>
+        </div>
+
+        {% if products %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {% for product in products %}
+                    <div class="product-card flex flex-col justify-between">
+                        <img src="{{ product.imagen_url if product.imagen_url else url_for('static', filename='img/product_placeholder.png') }}"
+                             alt="{{ product.nombre }}" class="w-full h-40 object-cover mb-4 rounded-md">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-1 truncate">{{ product.nombre }}</h3>
+                        <p class="text-sm text-gray-600 mb-2">Category: {{ product.categoria_nombre }}</p>
+                        <div class="flex items-baseline mb-2">
+                            {% if product.precio_descuento and product.precio_descuento < product.precio %}
+                                <span class="text-lg font-bold text-red-600"><span class="math-inline">\{\{ "%\.2f" \| format\(product\.precio\_descuento\) \}\}</span\>
+<span class\="text\-sm text\-gray\-500 line\-through ml\-2"\></span>{{ "%.2f" | format(product.precio) }}</span>
+                            {% else %}
+                                <span class="text-lg font-bold text-gray-900">${{ "%.2f" | format(product.precio) }}</span>
+                            {% endif %}
+                        </div>
+                        <p class="text-sm text-gray-700 mb-4">Stock: {{ product.stock }}</p>
+                        <p class="text-sm {% if product.activo %}text-green-600{% else %}text-red-600{% endif %} font-semibold mb-4">
+                            Status: {{ 'Active' if product.activo else 'Inactive' }}
+                        </p>
+
+                        <div class="flex space-x-2 mt-auto">
+                            <a href="{{ url_for('admin_bp.edit_product', product_id=product.id_producto) }}" class="btn-secondary px-4 py-2 flex-1 text-center">
+                                <i class="fas fa-edit mr-1"></i> Edit
+                            </a>
+                            <form action="{{ url_for('admin_bp.delete_product', product_id=product.id_producto) }}" method="POST" onsubmit="return confirm('Are you sure you want to change the status of this product?');" class="flex-1">
+                                <button type="submit" class="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition-colors shadow-md">
+                                    <i class="fas fa-power-off mr-1"></i> {{ 'Deactivate' if product.activo else 'Activate' }}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-center text-gray-600 mt-10">No products found. Start by adding a new one!</p>
+        {% endif %}
+
+        <div class="text-center mt-12">
+            <!-- "Load more..." functionality placeholder -->
+            <button class="btn-secondary hidden">Load more...</button>
+        </div>
+    </div>
+{% endblock %}

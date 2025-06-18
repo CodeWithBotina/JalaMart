@@ -1,0 +1,42 @@
+<!-- jalamart_frontend/templates/public/products_by_category.html -->
+{% extends 'layouts/base.html' %}
+
+{% block title %}{{ category_name }} Products{% endblock %}
+
+{% block content %}
+    <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <h1 class="text-3xl font-extrabold text-gray-900 mb-6">Products in {{ category_name }}</h1>
+
+        {% if products %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {% for product in products %}
+                    <div class="product-card">
+                        <img src="{{ product.imagen_url if product.imagen_url else url_for('static', filename='img/product_placeholder.png') }}"
+                             alt="{{ product.nombre }}" class="w-full h-40 object-cover mb-4 rounded-md">
+                        <h3 class="text-lg font-semibold text-gray-900 truncate">{{ product.nombre }}</h3>
+                        <p class="text-sm text-gray-600 mb-2 truncate">{{ product.descripcion | truncate(50) }}</p>
+                        <div class="flex items-baseline mb-4">
+                            {% if product.precio_descuento and product.precio_descuento < product.precio %}
+                                <span class="text-lg font-bold text-red-600">${{ "%.2f" | format(product.precio_descuento) }}</span>
+                                <span class="text-sm text-gray-500 line-through ml-2">${{ "%.2f" | format(product.precio) }}</span>
+                            {% else %}
+                                <span class="text-lg font-bold text-gray-900">${{ "%.2f" | format(product.precio) }}</span>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('public_bp.product_detail', product_id=product.id_producto) }}" class="w-full btn-primary text-center">SHOP NOW</a>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-8">
+                <!-- If you implement pagination, a "Load more" button would go here -->
+                <button class="btn-secondary hidden">Load more...</button>
+            </div>
+        {% else %}
+            <p class="text-center text-gray-600 mt-10">No products found in this category.</p>
+        {% endif %}
+
+        <div class="mt-10 text-center">
+            <a href="{{ url_for('public_bp.view_all_categories') }}" class="btn-secondary">Back to Categories</a>
+        </div>
+    </div>
+{% endblock %}

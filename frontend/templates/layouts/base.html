@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JalaMart - {% block title %}{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            @apply bg-gray-100 text-gray-800; /* Default background and text color */
+        }
+        /* Custom styles for elements that Tailwind doesn't easily cover or for specific overrides */
+        .gradient-background {
+            background: linear-gradient(90deg, rgba(59,130,246,1) 0%, rgba(37,99,235,1) 100%); /* Blue gradient */
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <header class="bg-blue-800 text-white p-4 shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto flex flex-wrap items-center justify-between">
+            <a href="{{ url_for('public_bp.home') }}" class="text-3xl font-bold rounded-md p-2 hover:bg-blue-700 transition-colors duration-200">JalaMart</a>
+
+            <form action="{{ url_for('public_bp.search_products') }}" method="GET" class="relative flex-grow mx-4 max-w-lg">
+                <input type="text" name="query" placeholder="Search products..."
+                       class="w-full py-2 px-4 rounded-full bg-blue-700 text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white focus:text-gray-800 transition-colors duration-300">
+                <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-blue-300 hover:text-white transition-colors duration-200">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+
+            <div class="flex items-center space-x-6 mt-4 md:mt-0">
+                <div class="relative group">
+                    <button class="flex items-center text-white text-lg font-medium hover:text-blue-200 transition-colors duration-200 rounded-md p-2">
+                        Categories <i class="fas fa-chevron-down ml-2 text-sm"></i>
+                    </button>
+                    <div class="absolute hidden group-hover:block bg-white text-gray-800 shadow-lg rounded-md mt-2 py-2 w-48 z-10">
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100">Electronics</a>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100">Dairy</a>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100">Fashion</a>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100">Home & Kitchen</a>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100">Toys</a>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100">Beverages</a>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100">Technology</a>
+                        <hr class="my-1 border-gray-200">
+                        <a href="{{ url_for('public_bp.view_all_categories') }}" class="block px-4 py-2 hover:bg-gray-100 font-bold text-blue-600">View All</a>
+                    </div>
+                </div>
+
+                <a href="{{ url_for('user_bp.view_cart') }}" class="relative text-white text-lg font-medium hover:text-blue-200 transition-colors duration-200 rounded-md p-2">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    {% if cart_item_count > 0 %}
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">{{ cart_item_count }}</span>
+                    {% endif %}
+                </a>
+
+                {% if current_user %}
+                    <div class="relative group">
+                        <button class="flex items-center text-white text-lg font-medium hover:text-blue-200 transition-colors duration-200 rounded-md p-2">
+                            Hi, {{ current_user.email.split('@')[0] }} <i class="fas fa-chevron-down ml-2 text-sm"></i>
+                        </button>
+                        <div class="absolute hidden group-hover:block bg-white text-gray-800 shadow-lg rounded-md mt-2 py-2 w-48 right-0 z-10">
+                            <a href="{{ url_for('user_bp.user_dashboard') }}" class="block px-4 py-2 hover:bg-gray-100">My Account</a>
+                            <a href="{{ url_for('user_bp.view_orders') }}" class="block px-4 py-2 hover:bg-gray-100">My Orders</a>
+                            {% if current_user.role == 'admin' %}
+                                <a href="{{ url_for('admin_bp.admin_dashboard') }}" class="block px-4 py-2 hover:bg-gray-100 font-bold text-red-600">Admin Dashboard</a>
+                            {% endif %}
+                            <hr class="my-1 border-gray-200">
+                            <a href="{{ url_for('auth_bp.logout') }}" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{{ url_for('auth_bp.login') }}" class="text-white text-lg font-medium hover:text-blue-200 transition-colors duration-200 rounded-md p-2">Login</a>
+                    <a href="{{ url_for('auth_bp.register') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md shadow-lg transition-colors duration-200">Register</a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <main class="flex-grow container mx-auto p-4 md:p-8">
+        <div class="my-4">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="p-4 mb-4 text-sm rounded-lg
+                                    {% if category == 'success' %} bg-green-100 text-green-800 {% endif %}
+                                    {% if category == 'error' %} bg-red-100 text-red-800 {% endif %}
+                                    {% if category == 'warning' %} bg-yellow-100 text-yellow-800 {% endif %}
+                                    {% if category == 'info' %} bg-blue-100 text-blue-800 {% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-blue-900 text-white p-8 mt-8">
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <h3 class="text-xl font-semibold mb-4">Contact Us</h3>
+                <p class="mb-2"><i class="fas fa-map-marker-alt mr-2"></i> Calle Vista Alegre, 13, Valencia, C. P. 10445</p>
+                <p class="mb-2"><i class="fas fa-envelope mr-2"></i> Jalamart@contacto.com</p>
+                <p class="mb-2"><i class="fas fa-phone-alt mr-2"></i> +54.9.388 140-0092</p>
+            </div>
+
+            <div class="md:col-span-2">
+                <h3 class="text-xl font-semibold mb-4">Find Our Nearest Branch</h3>
+                <p class="mb-4">We have more than 50 branches across Latin America.</p>
+                <div class="bg-gray-300 w-full h-48 rounded-md flex items-center justify-center text-gray-600 text-sm">
+                    <img src="{{ url_for('static', filename='img/map_placeholder.png') }}" alt="Map Placeholder" class="w-full h-full object-cover rounded-md">
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-8 pt-4 border-t border-blue-700">
+            <p>&copy; {{ now.year if now else '2025' }} JalaMart. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Set the current year dynamically for the footer
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentYearSpan = document.querySelector('footer p span');
+            if (currentYearSpan) {
+                currentYearSpan.textContent = new Date().getFullYear();
+            }
+        });
+    </script>
+</body>
+</html>
